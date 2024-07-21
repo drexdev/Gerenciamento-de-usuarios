@@ -11,6 +11,8 @@ import { UpdateUserDto } from "../dtos/update-user-dto";
 import { CreateUserDto } from "../dtos/create-user-dto";
 import { InternalError } from "../errors/InternalError";
 
+import jwt from "jsonwebtoken";
+
 export class UserService {
   /**
    * Utilizado para obter todos os usuários.
@@ -19,8 +21,10 @@ export class UserService {
    */
   async getUsers(): Promise<User[]> {
     try {
-      const { rows } = await client.query<User>("SELECT id, email, first_name, last_name FROM users ORDER BY id");
-      return rows
+      const { rows } = await client.query<User>(
+        "SELECT id, email, first_name, last_name FROM users ORDER BY id"
+      );
+      return rows;
     } catch (error) {
       // Log do erro pode ser adicionado aqui
       throw new Error("Erro ao obter os usuários");
@@ -79,7 +83,7 @@ export class UserService {
     lastName: string,
     email: string,
     password: string
-  ): Promise<User> {
+  ): Promise<User & { "access-token": string }> {
     const id = uuid(); // Cria um ID unico;
     const hashedPassword = await bcrypt.hash(password, 10); // Cria uma senha hash;
 
@@ -96,6 +100,7 @@ export class UserService {
     createUserDto.email = email;
     createUserDto.password = password;
 
+    // Validando os dados de entrada do corpo da requisição.
     const errors = await validate(createUserDto);
     if (errors.length > 0) {
       const errorMessages = errors
@@ -116,7 +121,21 @@ export class UserService {
 
       await client.query("COMMIT"); // Confirma a transação.
 
-      return rows[0]; // Retorna o usuário criado, sem a senha.
+      const createdUser = rows[0];
+
+      const payload = {
+        id: createdUser.id,
+        email: createUserDto.email,
+      };
+
+      const token = jwt.sign(payload, process.env.SECRET_KEY as string, {
+        expiresIn: "1d",
+      });
+
+      return {
+        ...createdUser,
+        "access-token": token,
+      }; // Retorna o usuário criado, sem a senha.
     } catch (error) {
       await client.query("ROLLBACK"); // Desfaz a transação.
       throw new InternalError(500, "Erro ao criar o novo usuário");
@@ -155,6 +174,7 @@ export class UserService {
 
     const errors = await validate(updateUserDto);
 
+    // Validando os dados de entrada do corpo da requisição.
     if (errors.length > 0) {
       const errorMessages = errors
         .map((err) => Object.values(err.constraints || {}))
@@ -165,6 +185,7 @@ export class UserService {
     if (email) {
       const existingUser = await this.getUserByEmail(email);
 
+      // Verifica se o email existe e se o email atual não corresponde ao email informado.
       if (existingUser && existingUser.id !== id) {
         throw new BadRequest("Este email está sendo usado por outro usuário.");
       }

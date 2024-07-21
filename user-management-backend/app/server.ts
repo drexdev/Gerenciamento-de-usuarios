@@ -1,15 +1,19 @@
-import fastify, { FastifyError } from "fastify";
+import fastify, { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 
 import consola from "consola";
 import chalk from "chalk";
 
 import dotenv from "dotenv";
 import { InternalError } from "./errors/InternalError";
+import authMiddleware from "./middleware/auth.middleware";
 
 const app = fastify(); // Cria uma instância do fastify.
 
 dotenv.config();
 
+app.register(authMiddleware); // Middleware de autenticação.
+
+// Tratamento de erros.
 app.setErrorHandler(function (error: FastifyError, _, reply) {
   if (error instanceof InternalError) {
     reply.status(error.statusCode).send({
@@ -21,7 +25,9 @@ app.setErrorHandler(function (error: FastifyError, _, reply) {
   }
 });
 
-app.register(require("@fastify/cors"), { origin: true }); // Permite o acesso de qualquer origem.
+app.register(require("@fastify/cors"), { origin: true }); // Permite o acesso de qualquer origem.~
+
+app.register(require("./routes/auth.route"), { prefix: "/auth" }); // Rotas de usuários. 
 app.register(require("./routes/user.route"), { prefix: "/users" }); // Rotas de usuários.
 
 // Ligando o servidor a porta 3000, host 0.0.0.0.

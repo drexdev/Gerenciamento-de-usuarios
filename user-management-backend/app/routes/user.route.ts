@@ -7,24 +7,28 @@ const userService = new UserService();
 
 export default async function userRoutes(fastify: FastifyInstance) {
   // Retorna uma lista de todos os usuários.
-  fastify.get("/", async (_, reply) => {
+  fastify.get("/", async (request, reply) => {
     const users = await userService.getUsers();
     reply.status(200).send(users);
   });
 
   // Cria um novo usuário.
-  fastify.post<{ Body: User }>("/", async (request, reply) => {
-    const { firstName, lastName, email, password } = request.body;
+  fastify.post<{ Body: User }>(
+    "/",
+    { public: true },
+    async (request, reply) => {
+      const { firstName, lastName, email, password } = request.body;
 
-    const user = await userService.createUser(
-      firstName,
-      lastName,
-      email,
-      password
-    );
+      const user = await userService.createUser(
+        firstName,
+        lastName,
+        email,
+        password
+      );
 
-    reply.status(201).send(user);
-  });
+      reply.status(201).send(user);
+    }
+  );
 
   // Atualizar um usuário existente.
   fastify.put<{ Body: User; Params: { id: string } }>(
