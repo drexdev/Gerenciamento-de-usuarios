@@ -6,11 +6,13 @@ import { User } from "../entities/user.entity";
 const userService = new UserService();
 
 export default async function userRoutes(fastify: FastifyInstance) {
-  fastify.get("/", async (request, reply) => {
+  // Retorna uma lista de todos os usuários.
+  fastify.get("/", async (_, reply) => {
     const users = await userService.getUsers();
-    reply.send(users);
+    reply.status(200).send(users);
   });
 
+  // Cria um novo usuário.
   fastify.post<{ Body: User }>("/", async (request, reply) => {
     const { firstName, lastName, email, password } = request.body;
 
@@ -21,7 +23,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
       password
     );
 
-    reply.send(user);
+    reply.status(201).send(user);
   });
 
   // Atualizar um usuário existente.
@@ -30,11 +32,9 @@ export default async function userRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       const { id } = request.params;
       const { firstName, lastName, email } = request.body;
-      
-      //   TODO: Verificar se o usuário existe.
 
       const user = await userService.updateUser(id, firstName, lastName, email);
-      reply.send(user);
+      reply.status(200).send(user);
     }
   );
 
@@ -42,8 +42,6 @@ export default async function userRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
     const { id } = request.params;
     await userService.deleteUser(id);
-
-    // TODO: Verificar se o usuário existe.
 
     reply.status(204).send({});
   });
