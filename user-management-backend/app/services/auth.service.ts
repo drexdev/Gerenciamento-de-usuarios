@@ -24,12 +24,12 @@ export class AuthService {
     email: string,
     password: string
   ): Promise<{ "access-token": string }> {
-      const updateUserDto = new AuthLoginDto(); // Cria um novo usuário.
+      const authLoginDto = new AuthLoginDto(); // Cria um DTO de autenticação.
 
-      updateUserDto.email = email;
-      updateUserDto.password = email;
+      authLoginDto.email = email;
+      authLoginDto.password = password;
 
-      const errors = await validate(updateUserDto);
+      const errors = await validate(authLoginDto);
 
       // Validando os dados de entrada do corpo da requisição.
       if (errors.length > 0) {
