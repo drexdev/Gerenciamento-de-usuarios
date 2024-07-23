@@ -2,10 +2,27 @@ import { FastifyInstance } from "fastify";
 
 import { UserService } from "../services/user.service";
 import { User } from "../entities/user.entity";
+import { Unauthorized } from "../errors/Unauthorized";
+import { BadRequest } from "../errors/BadRequest";
 
 const userService = new UserService();
 
 export default async function userRoutes(fastify: FastifyInstance) {
+  // Retorna os dados do usuário.
+  fastify.get("/@me", async (request, reply) => {
+    const user = request.user;
+
+    if (user) {
+      const { id, email, firstName, lastName } = await userService.getUserById(
+        user.id
+      );
+
+      return reply.status(200).send({ id, email, firstName, lastName });
+    }
+
+    throw new BadRequest("Necessário realizar o login.");
+  });
+
   // Retorna uma lista de todos os usuários.
   fastify.get("/", async (request, reply) => {
     const users = await userService.getUsers();

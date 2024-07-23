@@ -1,11 +1,23 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './components/app/index.tsx'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./components/app/index.tsx";
 
-import './index.css'
+import { ToastContainer } from "react-toastify";
 
-ReactDOM.createRoot(document.getElementById('app')!).render(
+import { BrowserRouter } from "react-router-dom";
+import AuthProvider from "./providers/auth-provider.tsx";
+
+import 'react-toastify/dist/ReactToastify.css';
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+
+        <ToastContainer />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);

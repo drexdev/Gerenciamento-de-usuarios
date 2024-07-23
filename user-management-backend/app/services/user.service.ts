@@ -39,12 +39,21 @@ export class UserService {
    */
   async getUserById(id: string): Promise<User> {
     try {
-      const { rows } = await client.query<User>(
-        "SELECT * FROM users WHERE id = $1",
-        [id]
-      ); // Busca o usuário pelo ID
+      const { rows } = await client.query("SELECT * FROM users WHERE id = $1", [
+        id,
+      ]); // Busca o usuário pelo ID
 
-      return rows[0] || null;
+      const user = rows[0];
+
+      return (
+        {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          password: user.password,
+        } || null
+      );
     } catch (error) {
       throw new InternalError(500, "Ocorreu um erro ao buscar o usuário.");
     }
@@ -58,12 +67,22 @@ export class UserService {
    */
   async getUserByEmail(email: string): Promise<User> {
     try {
-      const { rows } = await client.query<User>(
+      const { rows } = await client.query(
         "SELECT * FROM users WHERE email = $1",
         [email]
       ); // Busca o usuário pelo email
 
-      return rows[0] || null;
+      const user = rows[0];
+
+      return (
+        {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          password: user.password,
+        } || null
+      );
     } catch (error) {
       throw new InternalError(500, "Ocorreu um erro ao buscar o usuário.");
     }
