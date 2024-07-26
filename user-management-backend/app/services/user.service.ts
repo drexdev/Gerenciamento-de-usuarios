@@ -19,12 +19,18 @@ export class UserService {
    * @returns Uma Promise de uma lista de usuários.
    * @throws Erro se houver um problema na consulta ao banco de dados.
    */
-  async getUsers(): Promise<User[]> {
+  async getUsers(): Promise<Omit<User, "password">[]> {
     try {
-      const { rows } = await client.query<User>(
+      const { rows } = await client.query(
         "SELECT id, email, first_name, last_name FROM users ORDER BY id"
       );
-      return rows;
+
+      return rows.map((user) => ({
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name
+      }));
     } catch (error) {
       // Log do erro pode ser adicionado aqui
       throw new Error("Erro ao obter os usuários");
