@@ -1,22 +1,24 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes as Router } from "react-router-dom";
+
 import PublicLayout from "./layouts/PublicLayout.tsx";
-import Home from "../../pages";
 import PrivateLayout from "./layouts/PrivateLayout.tsx";
+
 import Dashboard from "../../pages/dashboard";
 
-function App() {
+import Home from "../../pages";
+import Login from "../../pages/Login.tsx";
+
+export function Routes() {
   return (
-    <Routes>
+    <Router>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Home />} />
+        <Route path="/login" element={<Login />} />
       </Route>
 
       <Route element={<PrivateLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
-    </Routes>
+    </Router>
   );
 }
-
-export default App;
