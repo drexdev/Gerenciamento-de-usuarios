@@ -16,7 +16,18 @@ ReactDOM.createRoot(document.getElementById("app")!).render(
       <AuthProvider>
         <Routes />
 
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          theme="dark"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

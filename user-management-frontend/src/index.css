@@ -30,12 +30,58 @@
 }
 
 @layer base {
+  :root {
+    --toastify-color-dark: #15151A;
+    --toastify-color-success: #35ff7c;
+    --toastify-color-error: #ff5e5e;
+  }
+
   html {
     @apply scroll-smooth;
   }
 
   body {
-    @apply bg-background text-textPrimary;
+    @apply bg-background text-textPrimary text-sm;
     font-family: "Inter Tight", sans-serif;
   }
+}
+
+@layer components {
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espaçamento entre os campos */
+  }
+  
+  
+
+  .form-group {
+    @apply flex flex-col gap-1 w-full;
+  }
+  
+  .label {
+    @apply text-sm font-medium text-gray-500;
+  }
+  
+  .input {
+    @apply w-full rounded-md bg-boxSecondary py-3 px-4 text-sm border border-boxTertiary;
+  }
+  
+  .submit-button {
+    @apply mt-2 py-3 px-4 bg-indigo-600 text-white font-medium rounded-md cursor-pointer transition-opacity;
+  }
+  
+  .submit-button:hover {
+    @apply opacity-80;
+  }
+  
+  .submit-button:active {
+    @apply opacity-50;
+  }
+
+  .submit-button:disabled {
+    @apply opacity-60 cursor-not-allowed pointer-events-none !bg-primary/60;
+  }
+  
+
 }

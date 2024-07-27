@@ -1,12 +1,35 @@
-import { AddCircle } from "iconsax-react";
-import Header from "../../components/header";
 import { useState } from "react";
-import useFetchUsers from "../../hooks/fetchUsers";
+
+import Header from "../../components/header";
+
+import { AddCircle } from "iconsax-react";
+
+import useDashboard from "../../hooks/useDashboard";
 import UsersTable from "./list-users";
+import { UserDialog } from "./components/user-form-dialog";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
-  const { users, fetching } = useFetchUsers(); // Importa os dados dos usuários
+  const { users, fetching, createUser, deleteUser, updateUser } =
+    useDashboard(); // Importa os dados dos usuários
   const [search, setSearch] = useState(""); // Valor da input de pesquisa
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleSubmitCreateUser = (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password?: string
+  ) => {
+    return createUser(firstName, lastName, email, password as string).then(
+      (user) => {
+        setDialogOpen(false);
+        toast.success("Usuário criado com sucesso!");
+        return user;
+      }
+    );
+  };
 
   return (
     <>
@@ -32,19 +55,30 @@ export default function Dashboard() {
               onChange={(event) => setSearch(event.target.value)}
               value={search}
             />
-            <button
-              className="px-5 py-3 text-sm bg-primary rounded-md transition-all hover:shadow-primary sm:active:scale-95 active:scale-105 flex items-center justify-center gap-2 text-white font-semibold max-sm:w-full max-sm:fixed max-sm:h-14 max-sm:bottom-0 max-sm:left-0 max-sm:z-50 max-sm:rounded-none"
-              onClick={() => {
-                // TODO: Cadastrar novo usuário
-              }}
+
+            <UserDialog
+              isOpen={dialogOpen}
+              onOpenChange={setDialogOpen}
+              title="Adicionar Usuário"
+              description="Insira os dados do novo usuário, incluindo nome, sobrenome, email e senha."
+              onSubmit={handleSubmitCreateUser}
+              type="create"
             >
-              <AddCircle size={20} />
-              <span>Cadastrar</span>
-            </button>
+              <div className="px-5 py-3 text-sm bg-primary rounded-md transition-all hover:shadow-primary sm:active:scale-95 active:scale-105 flex items-center justify-center gap-2 text-white font-semibold max-sm:w-full max-sm:fixed max-sm:h-14 max-sm:bottom-0 max-sm:left-0 max-sm:z-50 max-sm:rounded-none">
+                <AddCircle size={20} />
+                <span>Cadastrar</span>
+              </div>
+            </UserDialog>
           </div>
         </div>
-        
-        <UsersTable users={users} fetching={fetching} search={search}  />
+
+        <UsersTable
+          users={users}
+          fetching={fetching}
+          search={search}
+          deleteUser={deleteUser}
+          updateUser={updateUser}
+        />
       </div>
     </>
   );

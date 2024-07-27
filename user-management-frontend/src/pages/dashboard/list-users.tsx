@@ -1,48 +1,36 @@
-import { Edit2, Trash, InfoCircle } from "iconsax-react";
-import { AuthData } from "../../contexts/auth-context";
+import { InfoCircle } from "iconsax-react";
+
+import UserRow from "./user-row";
+import { User } from "../../hooks/useDashboard";
 
 interface UsersTableProps {
-  users: AuthData[];
+  users: User[];
   fetching: boolean;
   search: string;
+  deleteUser(id: number): Promise<number>;
+  updateUser(id: number, firstName: string, lastName: string, email: string): Promise<User>;
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({ users, fetching, search }) => {
+const UsersTable: React.FC<UsersTableProps> = ({
+  users,
+  fetching,
+  search,
+  deleteUser,
+  updateUser,
+}) => {
   const usersList = users
     .filter((user) =>
-      `${user.firstName} ${user.lastName} ${user.email} ${user.id}`.includes(search)
+      `${user.firstName} ${user.lastName} ${user.email} ${user.id}`.includes(
+        search
+      )
     )
     .map((user) => (
-      <tr className="border-b border-boxSecondary" key={user.id}>
-        <td className="px-6 py-4">
-          <div className="flex items-center gap-4">
-            <img
-              className="h-8 w-8 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-            <div>
-              <h1 className="text-textPrimary">
-                {user.firstName} {user.lastName}
-              </h1>
-            </div>
-          </div>
-        </td>
-        <td className="px-6 py-4">{user.id}</td>
-        <td className="px-6 py-4">{user.email}</td>
-        <td className="px-6 py-4">
-          <div className="flex items-center justify-end gap-4">
-            <div className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors cursor-pointer">
-              <Edit2 size={20} variant="Bold" />
-              <span>Editar</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors cursor-pointer">
-              <Trash size={20} variant="Bold" />
-              <span>Deletar</span>
-            </div>
-          </div>
-        </td>
-      </tr>
+      <UserRow
+        key={user.id}
+        user={user}
+        onEdit={(data) => updateUser(user.id, data.firstName, data.lastName, data.email)}
+        onDelete={() => deleteUser(user.id)}
+      />
     ));
 
   return (
@@ -50,14 +38,22 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, fetching, search }) => {
       <table className="w-full text-left text-sm text-gray-500 table-auto">
         <thead className="text-xs text-gray-500 uppercase bg-boxPrimary border border-boxSecondary">
           <tr>
-            <th scope="col" className="px-6 py-3">Usuário</th>
-            <th scope="col" className="px-6 py-3">ID do Usuário</th>
-            <th scope="col" className="px-6 py-3">Email</th>
-            <th scope="col" className="px-6 py-3 text-right">Ações</th>
+            <th scope="col" className="px-6 py-3">
+              Usuário
+            </th>
+            <th scope="col" className="px-6 py-3">
+              ID do Usuário
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Email
+            </th>
+            <th scope="col" className="px-6 py-3 text-right">
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody className="text-sm font-semibold">
-          {fetching ? ( 
+          {fetching ? (
             <tr>
               <td colSpan={4} className="px-6 py-4 text-center">
                 <div className="flex items-center justify-center h-full">
@@ -87,7 +83,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, fetching, search }) => {
               <td colSpan={4} className="px-6 py-4 text-center">
                 <div className="flex items-center justify-center h-full gap-2">
                   <InfoCircle className="w-5 h-5" />
-                  <p className="text-sm font-semibold">Nenhum resultado encontrado</p>
+                  <p className="text-sm font-semibold">
+                    Nenhum resultado encontrado
+                  </p>
                 </div>
               </td>
             </tr>
