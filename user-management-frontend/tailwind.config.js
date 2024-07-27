@@ -25,6 +25,10 @@ export default {
           "100%": { opacity: 1 },
         },
       },
+
+      boxShadow: {
+        primary: "0 0 15px -7px #4f46e5",
+      },
     },
   },
   plugins: [],

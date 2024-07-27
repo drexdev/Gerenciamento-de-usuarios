@@ -1,13 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-boxTertiary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/65;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-family: "Inter Tight", sans-serif;
+}
+
 @layer base {
-    body {
-        @apply bg-background text-textPrimary;
-        font-family: 'Inter Tight', sans-serif;
-    }
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-textPrimary;
+    font-family: "Inter Tight", sans-serif;
+  }
 }
