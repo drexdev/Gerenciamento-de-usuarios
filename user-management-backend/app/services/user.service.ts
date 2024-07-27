@@ -25,11 +25,12 @@ export class UserService {
         "SELECT id, email, first_name, last_name FROM users ORDER BY id"
       );
 
+      // Retornando os usuários com as propriedades corretas.
       return rows.map((user) => ({
         id: user.id,
         email: user.email,
         firstName: user.first_name,
-        lastName: user.last_name
+        lastName: user.last_name,
       }));
     } catch (error) {
       // Log do erro pode ser adicionado aqui
@@ -43,26 +44,24 @@ export class UserService {
    * @returns Uma Promise com o usuário correspondente ao ID.
    * @throws Erro se houver um problema na consulta ao banco de dados.
    */
-  async getUserById(id: string): Promise<User> {
-    try {
-      const { rows } = await client.query("SELECT * FROM users WHERE id = $1", [
-        id,
-      ]); // Busca o usuário pelo ID
+  async getUserById(id: string): Promise<User | null> {
+    const { rows } = await client.query("SELECT * FROM users WHERE id = $1", [
+      id,
+    ]); // Busca o usuário pelo ID
 
-      const user = rows[0];
+    const user = rows[0];
 
-      return (
-        {
-          id: user.id,
-          email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          password: user.password,
-        } || null
-      );
-    } catch (error) {
-      throw new InternalError(500, "Ocorreu um erro ao buscar o usuário.");
+    if (!user) {
+      return null;
     }
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      password: user.password,
+    };
   }
 
   /**
@@ -71,27 +70,25 @@ export class UserService {
    * @returns Uma Promise com o usuário correspondente ao email.
    * @throws Erro se houver um problema na consulta ao banco de dados.
    */
-  async getUserByEmail(email: string): Promise<User> {
-    try {
-      const { rows } = await client.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email]
-      ); // Busca o usuário pelo email
+  async getUserByEmail(email: string): Promise<User | null> {
+    const { rows } = await client.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    ); // Busca o usuário pelo email
 
-      const user = rows[0];
+    const user = rows[0];
 
-      return (
-        {
-          id: user.id,
-          email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          password: user.password,
-        } || null
-      );
-    } catch (error) {
-      throw new InternalError(500, "Ocorreu um erro ao buscar o usuário.");
+    if (!user) {
+      return null;
     }
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      password: user.password,
+    };
   }
 
   /**
@@ -108,7 +105,7 @@ export class UserService {
     lastName: string,
     email: string,
     password: string
-  ): Promise<User & { "access-token": string }> {
+  ): Promise<Omit<User, "password"> & { "access-token": string }> {
     const id = uuid(); // Cria um ID unico;
     const hashedPassword = await bcrypt.hash(password, 10); // Cria uma senha hash;
 
@@ -137,7 +134,7 @@ export class UserService {
     try {
       await client.query("BEGIN"); // Inicia uma transação.
 
-      const { rows } = await client.query<User>(
+      const { rows } = await client.query(
         `INSERT INTO users (id, first_name, last_name, email, password) 
         VALUES ($1, $2, $3, $4, $5) 
         RETURNING id, first_name, last_name, email`,
@@ -146,7 +143,13 @@ export class UserService {
 
       await client.query("COMMIT"); // Confirma a transação.
 
-      const createdUser = rows[0];
+      // Retorna o usuário criado, sem a senha.
+      const createdUser = {
+        id: rows[0].id,
+        firstName: rows[0].first_name,
+        lastName: rows[0].last_name,
+        email: rows[0].email
+      };
 
       const payload = {
         id: createdUser.id,
@@ -181,12 +184,13 @@ export class UserService {
     firstName?: string,
     lastName?: string,
     email?: string
-  ): Promise<User> {
+  ): Promise<Omit<User, "password">> {
     if (!id) {
       throw new BadRequest("O ID é obrigatório.");
     }
 
     const user = await this.getUserById(id);
+
     if (!user) {
       throw new NotFound("Usuário não encontrado.");
     }
@@ -219,7 +223,7 @@ export class UserService {
     try {
       await client.query("BEGIN"); // Inicia a transação.
 
-      const { rows } = await client.query<User>(
+      const { rows } = await client.query(
         `UPDATE users 
        SET first_name = COALESCE($1, first_name), 
            last_name = COALESCE($2, last_name), 
@@ -231,7 +235,13 @@ export class UserService {
 
       await client.query("COMMIT"); // Confirma as alterações no banco de dados.
 
-      return rows[0]; // Retorna o usuário atualizado.
+      // Retorna o usuário atualizado, sem a senha.
+      return {
+        id: rows[0].id,
+        firstName: rows[0].first_name,
+        lastName: rows[0].last_name,
+        email: rows[0].email,
+      };
     } catch (error) {
       await client.query("ROLLBACK"); // Desfaz as alterações no banco de dados.
       throw new InternalError(500, `Erro ao atualizar o usuário com ID ${id}`);
