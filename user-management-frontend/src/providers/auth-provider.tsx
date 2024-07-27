@@ -2,7 +2,6 @@ import React, { useState, ReactNode, useEffect } from "react";
 import { AuthContext, AuthData } from "../contexts/auth-context";
 
 import { authService } from "../services/auth.service";
-import { toast } from "react-toastify";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -27,17 +26,19 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @param {string} password - A senha do usuário.
    * @return {Promise<void>} - Uma Promise que é resolvida quando o usuário é autenticado com sucesso.
    */
-  function login(email: string, password: string) {
-    authService
+  async function login(email: string, password: string): Promise<AuthData | Error> {
+    return authService
       .signIn(email, password)
       .then(async (accessToken) => {
         authService.saveAuthData({ "access-token": accessToken });
 
         const userData = await authService.fetchDataUser();
         setUser(userData);
+
+        return userData;
       })
       .catch((error: Error) => {
-        toast.error(error.message);
+        throw error;
       });
   }
 

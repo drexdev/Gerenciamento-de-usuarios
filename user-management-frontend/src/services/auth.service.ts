@@ -25,7 +25,8 @@ async function signIn(email: string, password: string): Promise<string> {
         throw new Error("E-mail ou senha estão inválidos.");
       } else {
         // Caso haja um erro genérico, mostre uma mensagem de erro.
-        throw new Error(error.response.data.message);
+        const errorMessage = error.response.data.message;
+        throw new Error(typeof errorMessage === "string" ? errorMessage : errorMessage[0]); // Caso haja um erro e retorne uma array, pega o primeiro erro, caso seja uma string, retorna a string.
         // throw new Error("Ocorreu um erro ao tentar realizar o login.");
       }
     });

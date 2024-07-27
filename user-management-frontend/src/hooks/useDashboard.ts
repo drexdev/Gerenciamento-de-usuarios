@@ -50,7 +50,10 @@ const useDashboard = () => {
         password,
       })
       .catch((error) => {
-        throw new Error(error.response.data.message); // Caso haja um erro, mostre uma mensagem de erro.
+        const errorMessage = error.response.data.message;
+        throw new Error(
+          typeof errorMessage === "string" ? errorMessage : errorMessage[0]
+        ); // Caso haja um erro e retorne uma array, pega o primeiro erro, caso seja uma string, retorna a string.
       });
 
     // Cria um novo usuário na lista, retornando o usuário criado.

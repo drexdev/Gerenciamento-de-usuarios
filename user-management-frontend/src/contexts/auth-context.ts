@@ -15,7 +15,7 @@ type Authenticated = {
 
 type NotAuthenticated = {
   user: undefined;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<AuthData | Error>;
 };
 
 type AuthContextType = Authenticated | NotAuthenticated;
