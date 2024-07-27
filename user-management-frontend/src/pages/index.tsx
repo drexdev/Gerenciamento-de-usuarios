@@ -5,7 +5,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1 onClick={() => login("lucas@fywedev.com", "123456")}>Login</h1>
+            <h1 onClick={() => login("lucas@fywedev.com", "Mn*@0124")}>Login</h1>
         </div>
     )
 }
