@@ -171,19 +171,18 @@ export default function Register() {
               Digite sua senha:
             </label>
 
-            <div
-              className="flex items-center relative"
-              onClick={toggleShowPassword}
-            >
+            <div className="flex items-center relative">
               {showPassword ? (
                 <EyeSlash
                   className="absolute pl-3 right-4 cursor-pointer text-gray-500 border-l border-boxTertiary active:text-primary"
                   size={32}
+                  onClick={toggleShowPassword}
                 />
               ) : (
                 <Eye
                   className="absolute pl-3 right-4 cursor-pointer text-gray-500 border-l border-boxTertiary active:text-primary"
                   size={32}
+                  onClick={toggleShowPassword}
                 />
               )}
 
