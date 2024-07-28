@@ -13,7 +13,8 @@ async function start() {
   // Verificando se o banco de dados está configurado corretamente, caso não esteja conectado ou criado, ele tenta novamente a cada segundo;
   while (true) {
     try {
-      client.query(`
+      await client.query("SELECT 1"); // Testa a conexão com o banco de dados
+      await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR(64) UNIQUE PRIMARY KEY,
           first_name VARCHAR(255) NOT NULL,
@@ -24,10 +25,11 @@ async function start() {
       `);
 
       consola.success("Banco de dados criado e configurado com sucesso!");
-
       break;
     } catch (error) {
-      console.error(error);
+      consola.error(
+        "Erro ao conectar ao banco de dados, tentando novamente em 1 segundo..."
+      );
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
